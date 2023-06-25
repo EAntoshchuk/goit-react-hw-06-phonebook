@@ -2,7 +2,16 @@ import { legacy_createStore as createStore } from 'redux';
 import { useSelector } from 'react-redux';
 import { devToolsEnhancer } from '@redux-devtools/extension';
 import { configureStore, createReducer } from '@reduxjs/toolkit';
-import { valueSlice } from './valueSlice';
+import {
+  persistStore,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist';
+import { valueReducer } from './valueSlice';
 
 const initialState = {};
 
@@ -17,6 +26,8 @@ const rootReducer = (state = initialState, action) => {
 export const store = configureStore({
   reducer: {
     maValue: myReducer,
-    value: valueSlice.reducer,
+    value: valueReducer,
   },
 });
+
+export const persistor = persistStore(store);
