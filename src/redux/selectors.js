@@ -1,3 +1,1 @@
-import { useSelector } from 'react-redux';
-
-export const getValueSelector = state => state.value.value;
+export const getContactSelector = state => state.contacts.contacts;

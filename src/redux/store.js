@@ -1,9 +1,7 @@
-import { legacy_createStore as createStore } from 'redux';
-import { useSelector } from 'react-redux';
-import { devToolsEnhancer } from '@redux-devtools/extension';
-import { configureStore, createReducer } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import {
   persistStore,
+  persistReducer,
   FLUSH,
   REHYDRATE,
   PAUSE,
@@ -11,23 +9,31 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import { valueReducer } from './valueSlice';
+import storage from 'redux-persist/lib/storage';
+import { contactSlice } from './contactSlice';
 
-const initialState = {};
-
-const enhancer = devToolsEnhancer();
-
-const myReducer = createReducer(10, {});
-
-const rootReducer = (state = initialState, action) => {
-  return state;
+const persistConfig = {
+  key: 'contacts',
+  storage,
 };
+
+export const persistContactsReducer = persistReducer(
+  persistConfig,
+  contactSlice.reducer
+);
 
 export const store = configureStore({
   reducer: {
-    maValue: myReducer,
-    value: valueReducer,
+    contacts: persistContactsReducer,
+    filter: '',
   },
+
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoreActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
 
 export const persistor = persistStore(store);
