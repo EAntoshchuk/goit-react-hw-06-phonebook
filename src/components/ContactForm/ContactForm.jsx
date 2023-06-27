@@ -1,34 +1,27 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addContact } from 'redux/contactSlice';
+import { getContactSelector } from 'redux/selectors';
 import css from './ContactForm.module.css';
 
 export default function ContactForm() {
   const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-
-  const handleNameChange = event => {
-    const { value } = event.currentTarget;
-    setName(value);
-  };
-
-  const handleNumberChange = event => {
-    const { value } = event.currentTarget;
-    setNumber(value);
-  };
+  const contacts = useSelector(getContactSelector);
 
   const handleSubmit = e => {
     e.preventDefault();
     const form = e.target;
-    dispatch(addContact(form.elements.text.value));
+    const newContactName = form.elements.name.value;
+    const newContactNumber = form.elements.number.value;
+    if (contacts.find(({ name }) => name === newContactName)) {
+      alert(`${name} is already in contacts`);
+    } else {
+      dispatch(addContact({ name: newContactName, number: newContactNumber }));
+    }
     form.reset();
   };
-
-  // const resetInput = () => {
-  //   setName('');
-  //   setNumber('');
-  // };
 
   return (
     <form onSubmit={handleSubmit} className={css.form}>
@@ -39,8 +32,6 @@ export default function ContactForm() {
           className={css.form_input}
           type="text"
           name="name"
-          value={name}
-          onChange={handleNameChange}
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
@@ -53,8 +44,6 @@ export default function ContactForm() {
           className={css.form_input}
           type="tel"
           name="number"
-          value={number}
-          onChange={handleNumberChange}
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
